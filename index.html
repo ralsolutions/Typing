@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🧗 English Gym | Typing + Grammar Drills</title>
+    <title>🧗 English Gym | v3 - Finger Guide & Mistake Drills</title>
     <style>
         * { box-sizing: border-box; }
-        body { font-family: system-ui, -apple-system, sans-serif; max-width: 1000px; margin: 20px auto; padding: 20px; background: #1e1e2e; color: #cdd6f4; }
+        body { font-family: system-ui, -apple-system, sans-serif; max-width: 1100px; margin: 20px auto; padding: 20px; background: #1e1e2e; color: #cdd6f4; }
         .container { background: #313244; padding: 25px; border-radius: 16px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
         textarea, input[type="text"] { width: 100%; padding: 12px; background: #1e1e2e; color: #cdd6f4; border: 2px solid #45475a; border-radius: 8px; font-size: 16px; line-height: 1.5; }
         button { background: #89b4fa; color: #1e1e2e; border: none; padding: 12px 24px; font-weight: bold; border-radius: 40px; cursor: pointer; font-size: 16px; margin: 10px 10px 0 0; }
@@ -20,43 +20,46 @@
         .progress-bar { width: 100%; height: 10px; background: #45475a; border-radius: 5px; margin: 10px 0; }
         .progress-fill { height: 10px; background: #a6e3a1; border-radius: 5px; width: 0%; }
         .mistake-tag { background: #f38ba8; color: #1e1e2e; padding: 4px 12px; border-radius: 20px; display: inline-block; margin: 5px; font-size: 14px; }
-        .quiz-option { display: block; margin: 8px 0; padding: 10px; background: #313244; border-radius: 8px; cursor: pointer; border: 1px solid transparent; }
-        .quiz-option:hover { background: #45475a; }
-        .quiz-option.selected { border-color: #89b4fa; background: #1e1e2e; }
-        .correct-feedback { color: #a6e3a1; }
-        .incorrect-feedback { color: #f38ba8; }
         table { width: 100%; border-collapse: collapse; margin: 15px 0; background: #1e1e2e; }
         th, td { border: 1px solid #45475a; padding: 8px; text-align: left; }
         th { background: #313244; }
-        .timer { font-size: 32px; font-weight: bold; color: #f9e2af; }
+        .sticky-ref { background: #1e1e2e; border: 2px solid #89b4fa; padding: 10px; border-radius: 8px; margin: 10px 0; font-family: 'Courier New', monospace; }
+        .keyboard { display: flex; flex-direction: column; gap: 5px; margin: 15px 0; }
+        .key-row { display: flex; gap: 5px; justify-content: center; }
+        .key { background: #313244; border: 1px solid #45475a; border-radius: 6px; padding: 8px 12px; min-width: 45px; text-align: center; font-weight: bold; color: #cdd6f4; }
+        .key.highlight { background: #89b4fa; color: #1e1e2e; border-color: #89b4fa; }
+        .key span { font-size: 10px; display: block; color: #a6adc8; }
+        .mistake-drill-card { background: #1e1e2e; padding: 20px; border-radius: 12px; margin: 20px 0; }
+        .quiz-question { background: #1e1e2e; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .correct-feedback { color: #a6e3a1; }
+        .incorrect-feedback { color: #f38ba8; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🧗 Rope Access English Gym</h1>
-        <p><i>Paste JSON from ChatGPT → Practice with games → Track progress forever</i></p>
+        <h1>🧗 Rope Access English Gym v3</h1>
+        <p><i>Paste JSON → Finger‑guided typing → Drill your mistakes → Quiz yourself</i></p>
 
         <!-- JSON Input Section -->
         <div style="background: #f9e2af; color: #1e1e2e; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-            <h3>📋 Step 1: Paste AI Analysis JSON (includes original + corrected)</h3>
+            <h3>📋 Step 1: Paste AI Analysis JSON</h3>
             <textarea id="json-paste-area" placeholder='Paste the full JSON block here...' rows="4"></textarea>
             <button id="load-json-btn">🔁 Load Session & Start Training</button>
-            <button id="upload-progress-btn" class="secondary">📂 Upload Progress JSON (Optional)</button>
+            <button id="upload-progress-btn" class="secondary">📂 Upload Progress JSON</button>
             <input type="file" id="upload-json-file" accept=".json" style="display:none;">
         </div>
 
         <!-- Dashboard Stats -->
         <div id="progress-stats" class="stats hidden">
-            <h3>📈 Your Persistent Weaknesses (Across All Sessions)</h3>
-            <p>Total Sessions: <span id="total-sessions">0</span> | Unique Mistake Types: <span id="persistent-count">0</span></p>
+            <h3>📈 Persistent Weaknesses</h3>
+            <p>Total Sessions: <span id="total-sessions">0</span> | Unique Mistakes: <span id="persistent-count">0</span></p>
             <div id="weakness-list"></div>
-            <div class="progress-bar"><div id="total-progress-fill" class="progress-fill" style="width:0%"></div></div>
         </div>
 
-        <!-- Original & Corrected Display (always visible after load) -->
+        <!-- Original & Corrected Display -->
         <div id="session-info" class="hidden">
             <div style="display: flex; gap: 20px;">
-                <div class="diff-box" style="flex:1"><strong>📄 Your Original</strong><div id="original-display" style="white-space: pre-wrap; margin-top:10px;"></div></div>
+                <div class="diff-box" style="flex:1"><strong>📄 Original</strong><div id="original-display" style="white-space: pre-wrap; margin-top:10px;"></div></div>
                 <div class="diff-box" style="flex:1"><strong>✅ Corrected Target</strong><div id="corrected-display" style="white-space: pre-wrap; margin-top:10px;"></div></div>
             </div>
             <div id="mistake-table-container"></div>
@@ -64,48 +67,43 @@
 
         <!-- Tab Navigation -->
         <div id="training-tabs" class="tab-bar hidden">
-            <div class="tab active" data-tab="retype">⌨️ Touch Typing Re‑Type</div>
-            <div class="tab" data-tab="timed">⏱️ Timed Challenge</div>
-            <div class="tab" data-tab="quiz">📝 Fill‑in‑the‑Blanks Quiz</div>
+            <div class="tab active" data-tab="retype">⌨️ Re‑Type (Finger Guide)</div>
+            <div class="tab" data-tab="drill">🎯 Mistake Drill</div>
+            <div class="tab" data-tab="quiz">📝 Fill‑in‑the‑Blanks</div>
         </div>
 
-        <!-- Panel 1: Re-Type (Original method) -->
+        <!-- PANEL 1: RE-TYPE WITH FINGER GUIDE -->
         <div id="panel-retype" class="panel">
-            <h3>⌨️ Re‑Type the Corrected Text (Mismatch Blocked)</h3>
-            <p>Type exactly the green text above. The box will turn red if you make a mistake.</p>
-            <textarea id="retype-input" placeholder="Start typing the corrected text here..." rows="6"></textarea>
+            <h3>⌨️ Re‑Type with Finger Guide</h3>
+            <p>Type the corrected text exactly. The next character and suggested finger appear below.</p>
+            <div class="sticky-ref" id="retype-reference">Loading...</div>
+            <textarea id="retype-input" placeholder="Start typing here..." rows="4"></textarea>
             <div id="retype-feedback" style="margin:10px 0;"></div>
-            <button id="finish-retype" class="hidden">✅ Complete Re‑Type & Download Progress</button>
+            <!-- On-screen keyboard simplified -->
+            <div class="keyboard" id="keyboard-visual"></div>
+            <button id="finish-retype" class="hidden">✅ Complete & Download Progress</button>
         </div>
 
-        <!-- Panel 2: Timed Challenge -->
-        <div id="panel-timed" class="panel hidden">
-            <h3>⏱️ Timed Typing Challenge</h3>
-            <p>Type the corrected text before time runs out. Accuracy matters!</p>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <div class="timer" id="timer-display">02:00</div>
-                <button id="start-timer-btn">▶ Start Challenge</button>
-                <button id="reset-timer-btn" class="secondary">↻ Reset</button>
+        <!-- PANEL 2: MISTAKE DRILL (TIMED CHALLENGE REPLACED) -->
+        <div id="panel-drill" class="panel hidden">
+            <h3>🎯 Mistake Drill (Build Muscle Memory)</h3>
+            <p>For each mistake you made, type the correction 3 times correctly.</p>
+            <div id="drill-container">
+                <p>No mistakes to drill? Great job!</p>
             </div>
-            <div class="progress-bar"><div id="timer-progress-fill" class="progress-fill" style="width:100%"></div></div>
-            <textarea id="timed-input" placeholder="Timer not started..." rows="6" disabled></textarea>
-            <div id="timed-feedback" style="margin:10px 0;"></div>
-            <div id="timed-result"></div>
+            <div id="drill-progress" style="margin:15px 0;"></div>
+            <button id="reset-drill" class="secondary">🔄 Restart Drill</button>
         </div>
 
-        <!-- Panel 3: Fill-in-the-Blanks Quiz -->
+        <!-- PANEL 3: FILL-IN-THE-BLANKS (TEXT INPUT) -->
         <div id="panel-quiz" class="panel hidden">
-            <h3>📝 Grammar & Spelling Quiz (Based on Your Mistakes)</h3>
-            <div id="quiz-container">
-                <p>Loading quiz questions from your mistake list...</p>
-            </div>
-            <button id="submit-quiz" class="secondary">✅ Submit Answers</button>
+            <h3>📝 Fill‑in‑the‑Blanks Quiz</h3>
+            <p>Type the correct word or phrase for each mistake.</p>
+            <div id="quiz-container"></div>
+            <button id="submit-quiz" class="secondary">✅ Check Answers</button>
             <button id="reset-quiz" class="secondary">🔄 Retake Quiz</button>
             <div id="quiz-score" style="margin-top:15px;"></div>
         </div>
-
-        <!-- Download Area -->
-        <div id="download-area" style="margin-top:20px;"></div>
     </div>
 
     <script>
@@ -118,20 +116,16 @@
                     correctedText: '',
                     mistakes: [],
                     date: new Date().toISOString()
-                },
-                retypeCompleted: false,
-                timedCompleted: false,
-                quizCompleted: false
+                }
             };
 
-            // Timer variables
-            let timerInterval = null;
-            let timeLeft = 120; // seconds
-            let timerRunning = false;
-
-            // Quiz state
-            let quizQuestions = [];
-            let userAnswers = [];
+            // Finger mapping (simplified QWERTY)
+            const fingerMap = {
+                'q':1,'w':2,'e':3,'r':4,'t':4,'y':4,'u':4,'i':3,'o':2,'p':1,
+                'a':1,'s':2,'d':3,'f':4,'g':4,'h':4,'j':4,'k':3,'l':2,
+                'z':1,'x':2,'c':3,'v':4,'b':4,'n':4,'m':4
+            };
+            const fingerNames = ['','Pinky','Ring','Middle','Index'];
 
             // DOM elements
             const jsonArea = document.getElementById('json-paste-area');
@@ -140,12 +134,14 @@
             const tabsDiv = document.getElementById('training-tabs');
             const panels = {
                 retype: document.getElementById('panel-retype'),
-                timed: document.getElementById('panel-timed'),
+                drill: document.getElementById('panel-drill'),
                 quiz: document.getElementById('panel-quiz')
             };
             const retypeInput = document.getElementById('retype-input');
-            const finishRetypeBtn = document.getElementById('finish-retype');
+            const retypeRef = document.getElementById('retype-reference');
             const retypeFeedback = document.getElementById('retype-feedback');
+            const finishRetypeBtn = document.getElementById('finish-retype');
+            const keyboardVisual = document.getElementById('keyboard-visual');
             const originalDisplay = document.getElementById('original-display');
             const correctedDisplay = document.getElementById('corrected-display');
             const mistakeTableContainer = document.getElementById('mistake-table-container');
@@ -154,7 +150,7 @@
             // ---------- UTILS ----------
             function renderMistakeTable(mistakes) {
                 if (!mistakes || mistakes.length === 0) {
-                    mistakeTableContainer.innerHTML = '<p>No mistakes recorded. Excellent!</p>';
+                    mistakeTableContainer.innerHTML = '<p>No mistakes. Excellent!</p>';
                     return;
                 }
                 let html = '<table><tr><th>Type</th><th>Original</th><th>Correction</th></tr>';
@@ -176,15 +172,10 @@
                 const errorCount = Object.keys(appState.history.persistentErrors).length;
                 document.getElementById('persistent-count').innerText = errorCount;
                 const sorted = Object.entries(appState.history.persistentErrors)
-                    .sort((a,b) => b[1] - a[1])
-                    .slice(0, 5);
+                    .sort((a,b) => b[1] - a[1]).slice(0,5);
                 let html = '';
-                sorted.forEach(([key, count]) => {
-                    html += `<span class="mistake-tag">${key} (${count})</span>`;
-                });
-                document.getElementById('weakness-list').innerHTML = html || 'No persistent errors recorded.';
-                const fill = Math.min(appState.history.sessions.length * 10, 100);
-                document.getElementById('total-progress-fill').style.width = fill + '%';
+                sorted.forEach(([key,count]) => html += `<span class="mistake-tag">${key} (${count})</span>`);
+                document.getElementById('weakness-list').innerHTML = html || 'No persistent errors.';
             }
 
             function loadSessionFromJSON(jsonData) {
@@ -203,45 +194,77 @@
                 document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                 document.querySelector('[data-tab="retype"]').classList.add('active');
                 panels.retype.classList.remove('hidden');
-                panels.timed.classList.add('hidden');
+                panels.drill.classList.add('hidden');
                 panels.quiz.classList.add('hidden');
-                // Reset timer
-                resetTimer();
-                // Generate quiz
-                generateQuizFromMistakes(appState.currentSession.mistakes);
-                appState.retypeCompleted = false;
-                appState.timedCompleted = false;
-                appState.quizCompleted = false;
+                // Build keyboard
+                buildKeyboard();
+                updateRetypeReference();
+                // Setup drill
+                setupDrill();
+                setupQuiz();
             }
 
-            // ---------- EVENT: Load JSON ----------
-            loadBtn.addEventListener('click', () => {
-                const jsonStr = jsonArea.value.trim();
-                if (!jsonStr) { alert('Paste the JSON first.'); return; }
-                try {
-                    const data = JSON.parse(jsonStr);
-                    if (!data.correctedText) throw new Error('Missing correctedText');
-                    loadSessionFromJSON(data);
-                } catch(e) {
-                    alert('Invalid JSON: ' + e.message);
-                }
-            });
+            // ---------- KEYBOARD & FINGER GUIDE ----------
+            function buildKeyboard() {
+                const rows = [
+                    ['`','1','2','3','4','5','6','7','8','9','0','-','='],
+                    ['q','w','e','r','t','y','u','i','o','p','[',']','\\'],
+                    ['a','s','d','f','g','h','j','k','l',';','\''],
+                    ['z','x','c','v','b','n','m',',','.','/']
+                ];
+                let html = '';
+                rows.forEach(row => {
+                    html += '<div class="key-row">';
+                    row.forEach(key => {
+                        const finger = fingerMap[key.toLowerCase()] || '';
+                        const fingerLabel = finger ? fingerNames[finger] : '';
+                        html += `<div class="key" data-key="${key.toLowerCase()}">${key}<span>${fingerLabel}</span></div>`;
+                    });
+                    html += '</div>';
+                });
+                keyboardVisual.innerHTML = html;
+            }
 
-            // ---------- RE-TYPE PANEL ----------
+            function highlightNextKey(targetChar) {
+                const keys = document.querySelectorAll('.key');
+                keys.forEach(k => k.classList.remove('highlight'));
+                if (!targetChar) return;
+                const lower = targetChar.toLowerCase();
+                const keyEl = Array.from(keys).find(k => k.dataset.key === lower);
+                if (keyEl) keyEl.classList.add('highlight');
+            }
+
+            function updateRetypeReference() {
+                const target = appState.currentSession.correctedText;
+                const typed = retypeInput.value;
+                const remaining = target.substring(typed.length);
+                const nextChars = remaining.substring(0, 30);
+                const nextChar = remaining.charAt(0);
+                retypeRef.innerHTML = `<strong>Next:</strong> <span style="background:#45475a; padding:2px 6px; border-radius:4px;">${nextChars || '(done)'}</span>`;
+                if (nextChar) {
+                    const finger = fingerMap[nextChar.toLowerCase()] || '';
+                    const fingerName = finger ? fingerNames[finger] : '?';
+                    retypeRef.innerHTML += ` &nbsp; | &nbsp; <strong>Use:</strong> ${fingerName} finger for "${nextChar}"`;
+                    highlightNextKey(nextChar);
+                } else {
+                    highlightNextKey('');
+                }
+            }
+
             retypeInput.addEventListener('input', () => {
                 const target = appState.currentSession.correctedText;
                 const current = retypeInput.value;
                 if (target.startsWith(current)) {
                     retypeInput.style.borderColor = '#a6e3a1';
-                    retypeFeedback.innerHTML = '✅ Good. Keep typing without looking at keyboard.';
+                    retypeFeedback.innerHTML = '✅ Good. Keep going.';
                 } else {
                     retypeInput.style.borderColor = '#f38ba8';
-                    retypeFeedback.innerHTML = '❌ Mismatch. Fix from the point of error.';
+                    retypeFeedback.innerHTML = '❌ Mismatch. Fix from the error.';
                 }
+                updateRetypeReference();
                 if (current === target) {
-                    retypeFeedback.innerHTML = '🎉 Perfect! Re-type complete.';
+                    retypeFeedback.innerHTML = '🎉 Perfect! Session complete.';
                     finishRetypeBtn.classList.remove('hidden');
-                    appState.retypeCompleted = true;
                 } else {
                     finishRetypeBtn.classList.add('hidden');
                 }
@@ -249,219 +272,121 @@
 
             finishRetypeBtn.addEventListener('click', () => {
                 if (retypeInput.value !== appState.currentSession.correctedText) {
-                    alert('You must type the entire corrected text exactly.');
+                    alert('Type the entire corrected text exactly.');
                     return;
                 }
                 saveSessionAndDownload();
             });
 
-            // ---------- TIMED CHALLENGE ----------
-            const timerDisplay = document.getElementById('timer-display');
-            const timerProgress = document.getElementById('timer-progress-fill');
-            const timedInput = document.getElementById('timed-input');
-            const timedFeedback = document.getElementById('timed-feedback');
-            const timedResult = document.getElementById('timed-result');
-            const startTimerBtn = document.getElementById('start-timer-btn');
-            const resetTimerBtn = document.getElementById('reset-timer-btn');
+            // ---------- MISTAKE DRILL ----------
+            let drillItems = [];
+            let currentDrillIndex = 0;
+            let currentRep = 0;
+            const REPETITIONS = 3;
 
-            function formatTime(sec) {
-                const m = Math.floor(sec / 60).toString().padStart(2,'0');
-                const s = (sec % 60).toString().padStart(2,'0');
-                return `${m}:${s}`;
-            }
-
-            function updateTimerUI() {
-                timerDisplay.innerText = formatTime(timeLeft);
-                const percent = (timeLeft / 120) * 100;
-                timerProgress.style.width = percent + '%';
-                if (timeLeft <= 0) {
-                    timerProgress.style.width = '0%';
-                }
-            }
-
-            function resetTimer() {
-                if (timerInterval) clearInterval(timerInterval);
-                timerRunning = false;
-                timeLeft = 120;
-                updateTimerUI();
-                timedInput.value = '';
-                timedInput.disabled = true;
-                timedFeedback.innerHTML = '';
-                timedResult.innerHTML = '';
-                startTimerBtn.innerText = '▶ Start Challenge';
-                appState.timedCompleted = false;
-            }
-
-            function startTimer() {
-                if (timerRunning) return;
-                if (timeLeft <= 0) timeLeft = 120;
-                timerRunning = true;
-                timedInput.disabled = false;
-                timedInput.focus();
-                startTimerBtn.innerText = '⏸️ Running...';
-                timerInterval = setInterval(() => {
-                    if (timeLeft > 0) {
-                        timeLeft--;
-                        updateTimerUI();
-                        // Check completion
-                        if (timedInput.value === appState.currentSession.correctedText) {
-                            clearInterval(timerInterval);
-                            timerRunning = false;
-                            timedInput.disabled = true;
-                            timedFeedback.innerHTML = '🎉 You finished with time left! Perfect!';
-                            appState.timedCompleted = true;
-                            startTimerBtn.innerText = '▶ Start Challenge';
-                        }
-                        if (timeLeft === 0) {
-                            clearInterval(timerInterval);
-                            timerRunning = false;
-                            timedInput.disabled = true;
-                            timedFeedback.innerHTML = '⏰ Time\'s up! Check your accuracy.';
-                            // Compare with target and show diff
-                            const userText = timedInput.value;
-                            if (userText === appState.currentSession.correctedText) {
-                                timedResult.innerHTML = '<span style="color:#a6e3a1">Perfect! You typed it correctly just in time.</span>';
-                                appState.timedCompleted = true;
-                            } else {
-                                timedResult.innerHTML = '<span style="color:#f38ba8">You didn\'t finish in time. Try again.</span>';
-                            }
-                            startTimerBtn.innerText = '▶ Start Challenge';
-                        }
-                    }
-                }, 1000);
-            }
-
-            startTimerBtn.addEventListener('click', () => {
-                if (!appState.currentSession.correctedText) {
-                    alert('Load a session first.');
-                    return;
-                }
-                if (timerRunning) {
-                    // Pause not implemented for simplicity
-                } else {
-                    if (timeLeft <= 0) timeLeft = 120;
-                    startTimer();
-                }
-            });
-
-            resetTimerBtn.addEventListener('click', resetTimer);
-
-            timedInput.addEventListener('input', () => {
-                if (timedInput.value === appState.currentSession.correctedText) {
-                    if (timerRunning) {
-                        clearInterval(timerInterval);
-                        timerRunning = false;
-                        startTimerBtn.innerText = '▶ Start Challenge';
-                    }
-                    timedFeedback.innerHTML = '✅ Correct! Well done.';
-                    appState.timedCompleted = true;
-                } else {
-                    // optional live feedback
-                }
-            });
-
-            // ---------- QUIZ GENERATION ----------
-            function generateQuizFromMistakes(mistakes) {
+            function setupDrill() {
+                const mistakes = appState.currentSession.mistakes;
                 if (!mistakes || mistakes.length === 0) {
-                    quizQuestions = [];
-                    document.getElementById('quiz-container').innerHTML = '<p>No mistakes to practice. Great job!</p>';
+                    document.getElementById('drill-container').innerHTML = '<p>No mistakes to drill. Great job!</p>';
                     return;
                 }
-                // Create one question per mistake (or group similar)
-                quizQuestions = mistakes.map((m, idx) => {
-                    // Generate distractors (simple variants)
-                    const distractors = [m.correction];
-                    // Add some fake options based on original
-                    if (m.type.includes('spelling')) {
-                        distractors.push(m.original + 'e', m.original.slice(0,-1)+'y');
+                drillItems = mistakes.map(m => ({ original: m.original, correction: m.correction }));
+                currentDrillIndex = 0;
+                currentRep = 0;
+                renderDrillCard();
+            }
+
+            function renderDrillCard() {
+                if (currentDrillIndex >= drillItems.length) {
+                    document.getElementById('drill-container').innerHTML = '<h3>🎉 Drill Complete! All mistakes practiced.</h3>';
+                    document.getElementById('drill-progress').innerHTML = '';
+                    return;
+                }
+                const item = drillItems[currentDrillIndex];
+                const container = document.getElementById('drill-container');
+                container.innerHTML = `
+                    <div class="mistake-drill-card">
+                        <p><strong>Mistake ${currentDrillIndex+1} of ${drillItems.length}</strong> (Rep ${currentRep+1}/${REPETITIONS})</p>
+                        <p>Original: <span style="color:#f38ba8; background:#313244; padding:4px 8px; border-radius:4px;">${item.original}</span></p>
+                        <p>Correct version to type: <span style="color:#a6e3a1;">${item.correction}</span></p>
+                        <input type="text" id="drill-input" placeholder="Type the correction here..." style="margin:10px 0;">
+                        <button id="check-drill-btn">✅ Check & Next</button>
+                        <div id="drill-feedback" style="margin-top:8px;"></div>
+                    </div>
+                `;
+                document.getElementById('check-drill-btn').addEventListener('click', () => {
+                    const input = document.getElementById('drill-input');
+                    const feedback = document.getElementById('drill-feedback');
+                    if (input.value.trim() === item.correction) {
+                        feedback.innerHTML = '<span class="correct-feedback">✅ Correct!</span>';
+                        if (currentRep + 1 >= REPETITIONS) {
+                            currentDrillIndex++;
+                            currentRep = 0;
+                        } else {
+                            currentRep++;
+                        }
+                        renderDrillCard();
                     } else {
-                        distractors.push(m.original, m.original.replace('have','has'));
+                        feedback.innerHTML = '<span class="incorrect-feedback">❌ Not quite. Try again.</span>';
                     }
-                    // Shuffle options
-                    const options = [...new Set(distractors)]; // unique
-                    const shuffled = options.sort(() => Math.random() - 0.5);
-                    return {
-                        id: idx,
-                        type: m.type,
-                        original: m.original,
-                        correction: m.correction,
-                        options: shuffled,
-                        userChoice: null
-                    };
                 });
+            }
+
+            document.getElementById('reset-drill').addEventListener('click', setupDrill);
+
+            // ---------- FILL-IN-THE-BLANKS QUIZ (TEXT INPUT) ----------
+            let quizItems = [];
+
+            function setupQuiz() {
+                quizItems = appState.currentSession.mistakes.map(m => ({
+                    original: m.original,
+                    correction: m.correction,
+                    type: m.type,
+                    userAnswer: ''
+                }));
                 renderQuiz();
             }
 
             function renderQuiz() {
                 const container = document.getElementById('quiz-container');
-                if (quizQuestions.length === 0) {
-                    container.innerHTML = '<p>No quiz questions available.</p>';
+                if (quizItems.length === 0) {
+                    container.innerHTML = '<p>No mistakes to quiz on. Great job!</p>';
                     return;
                 }
                 let html = '';
-                quizQuestions.forEach((q, i) => {
-                    html += `<div style="margin-bottom:20px; padding:15px; background:#1e1e2e; border-radius:8px;">`;
-                    html += `<p><strong>${i+1}. Error type: ${q.type}</strong><br>`;
-                    html += `Original phrase: <span style="color:#f38ba8; background:#313244; padding:2px 6px; border-radius:4px;">"${q.original}"</span></p>`;
-                    html += `<p>Choose the correct version:</p>`;
-                    q.options.forEach(opt => {
-                        html += `<label class="quiz-option" data-qid="${i}" data-value="${opt}">`;
-                        html += `<input type="radio" name="q${i}" value="${opt}" style="margin-right:8px;"> ${opt}`;
-                        html += `</label>`;
-                    });
-                    html += `<div id="feedback-q${i}" style="margin-top:8px;"></div>`;
-                    html += `</div>`;
+                quizItems.forEach((item, idx) => {
+                    html += `<div class="quiz-question">
+                        <p><strong>${idx+1}. Error type: ${item.type}</strong><br>
+                        Original: <span style="color:#f38ba8;">"${item.original}"</span></p>
+                        <p>Write the correct version:</p>
+                        <input type="text" id="quiz-input-${idx}" placeholder="Your answer" style="width:100%;">
+                        <div id="quiz-feedback-${idx}" style="margin-top:5px;"></div>
+                    </div>`;
                 });
                 container.innerHTML = html;
-                // Attach event listeners for radio selection (optional visual)
-                document.querySelectorAll('.quiz-option').forEach(label => {
-                    label.addEventListener('click', (e) => {
-                        const radio = label.querySelector('input[type="radio"]');
-                        if (radio) radio.checked = true;
-                        // Remove selected class from siblings
-                        const parent = label.parentNode;
-                        parent.querySelectorAll('.quiz-option').forEach(l => l.classList.remove('selected'));
-                        label.classList.add('selected');
-                    });
-                });
-                userAnswers = new Array(quizQuestions.length).fill(null);
                 document.getElementById('quiz-score').innerHTML = '';
             }
 
             document.getElementById('submit-quiz').addEventListener('click', () => {
-                if (quizQuestions.length === 0) return;
                 let score = 0;
-                quizQuestions.forEach((q, idx) => {
-                    const selected = document.querySelector(`input[name="q${idx}"]:checked`);
-                    const feedbackDiv = document.getElementById(`feedback-q${idx}`);
-                    if (selected) {
-                        const chosen = selected.value;
-                        q.userChoice = chosen;
-                        if (chosen === q.correction) {
-                            score++;
-                            feedbackDiv.innerHTML = `<span class="correct-feedback">✅ Correct! "${chosen}" is right.</span>`;
-                        } else {
-                            feedbackDiv.innerHTML = `<span class="incorrect-feedback">❌ Incorrect. The correct answer is "${q.correction}".</span>`;
-                        }
+                quizItems.forEach((item, idx) => {
+                    const input = document.getElementById(`quiz-input-${idx}`);
+                    const feedback = document.getElementById(`quiz-feedback-${idx}`);
+                    const answer = input.value.trim();
+                    if (answer === item.correction) {
+                        score++;
+                        feedback.innerHTML = '<span class="correct-feedback">✅ Correct!</span>';
                     } else {
-                        feedbackDiv.innerHTML = `<span class="incorrect-feedback">⚠️ No answer selected. Correct: "${q.correction}".</span>`;
+                        feedback.innerHTML = `<span class="incorrect-feedback">❌ Incorrect. Correct: "${item.correction}"</span>`;
                     }
                 });
-                const total = quizQuestions.length;
-                document.getElementById('quiz-score').innerHTML = `<h3>Score: ${score} / ${total}</h3>`;
-                if (score === total) {
-                    appState.quizCompleted = true;
-                }
+                document.getElementById('quiz-score').innerHTML = `<h3>Score: ${score} / ${quizItems.length}</h3>`;
             });
 
-            document.getElementById('reset-quiz').addEventListener('click', () => {
-                generateQuizFromMistakes(appState.currentSession.mistakes);
-                appState.quizCompleted = false;
-            });
+            document.getElementById('reset-quiz').addEventListener('click', setupQuiz);
 
             // ---------- SAVE & DOWNLOAD ----------
             function saveSessionAndDownload() {
-                // Add current session mistakes to persistent history
                 appState.currentSession.mistakes.forEach(m => {
                     const key = `${m.type}: ${m.original} → ${m.correction}`;
                     appState.history.persistentErrors[key] = (appState.history.persistentErrors[key] || 0) + 1;
@@ -484,13 +409,11 @@
                 a.click();
                 URL.revokeObjectURL(url);
                 updateProgressDashboard();
-                alert('Progress saved! JSON downloaded.');
+                alert('Progress saved!');
             }
 
             // ---------- UPLOAD PROGRESS ----------
-            document.getElementById('upload-progress-btn').addEventListener('click', () => {
-                document.getElementById('upload-json-file').click();
-            });
+            document.getElementById('upload-progress-btn').addEventListener('click', ()=> document.getElementById('upload-json-file').click());
             document.getElementById('upload-json-file').addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if(!file) return;
@@ -508,6 +431,17 @@
                 reader.readAsText(file);
             });
 
+            // ---------- LOAD JSON ----------
+            loadBtn.addEventListener('click', () => {
+                const jsonStr = jsonArea.value.trim();
+                if (!jsonStr) { alert('Paste the JSON first.'); return; }
+                try {
+                    const data = JSON.parse(jsonStr);
+                    if (!data.correctedText) throw new Error('Missing correctedText');
+                    loadSessionFromJSON(data);
+                } catch(e) { alert('Invalid JSON: ' + e.message); }
+            });
+
             // ---------- TAB SWITCHING ----------
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.addEventListener('click', () => {
@@ -515,15 +449,14 @@
                     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                     tab.classList.add('active');
                     panels.retype.classList.add('hidden');
-                    panels.timed.classList.add('hidden');
+                    panels.drill.classList.add('hidden');
                     panels.quiz.classList.add('hidden');
                     if (target === 'retype') panels.retype.classList.remove('hidden');
-                    if (target === 'timed') panels.timed.classList.remove('hidden');
+                    if (target === 'drill') panels.drill.classList.remove('hidden');
                     if (target === 'quiz') panels.quiz.classList.remove('hidden');
                 });
             });
 
-            // Initialize dashboard
             updateProgressDashboard();
         })();
     </script>
