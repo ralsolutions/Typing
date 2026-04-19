@@ -3,273 +3,529 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🧗 Free English Typing Gym | No API Key</title>
+    <title>🧗 English Gym | Typing + Grammar Drills</title>
     <style>
-        body { font-family: system-ui, -apple-system, sans-serif; max-width: 900px; margin: 20px auto; padding: 20px; background: #1e1e2e; color: #cdd6f4; }
+        * { box-sizing: border-box; }
+        body { font-family: system-ui, -apple-system, sans-serif; max-width: 1000px; margin: 20px auto; padding: 20px; background: #1e1e2e; color: #cdd6f4; }
         .container { background: #313244; padding: 25px; border-radius: 16px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        textarea, .retype-area { width: 100%; padding: 15px; background: #1e1e2e; color: #cdd6f4; border: 2px solid #45475a; border-radius: 8px; font-size: 16px; line-height: 1.5; resize: vertical; }
-        .retype-area { font-family: 'Courier New', monospace; letter-spacing: 1px; }
+        textarea, input[type="text"] { width: 100%; padding: 12px; background: #1e1e2e; color: #cdd6f4; border: 2px solid #45475a; border-radius: 8px; font-size: 16px; line-height: 1.5; }
         button { background: #89b4fa; color: #1e1e2e; border: none; padding: 12px 24px; font-weight: bold; border-radius: 40px; cursor: pointer; font-size: 16px; margin: 10px 10px 0 0; }
         button.secondary { background: #45475a; color: #cdd6f4; }
-        .error-highlight { color: #f38ba8; font-weight: bold; }
-        .correct-highlight { color: #a6e3a1; }
-        .word-count { float: right; font-size: 14px; color: #a6adc8; }
-        .diff-view { display: flex; gap: 20px; margin-top: 20px; }
-        .diff-box { flex: 1; background: #181825; padding: 15px; border-radius: 8px; border-left: 4px solid #89b4fa; }
-        .progress-bar { width: 100%; height: 8px; background: #45475a; border-radius: 4px; margin: 10px 0; }
-        .progress-fill { height: 8px; background: #a6e3a1; border-radius: 4px; width: 0%; }
-        .hidden { display: none; }
-        .stats { background: #181825; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .tab-bar { display: flex; gap: 5px; margin: 20px 0 10px; border-bottom: 2px solid #45475a; }
+        .tab { padding: 10px 20px; background: #181825; border-radius: 8px 8px 0 0; cursor: pointer; border: 1px solid #45475a; border-bottom: none; }
+        .tab.active { background: #89b4fa; color: #1e1e2e; font-weight: bold; }
+        .panel { background: #181825; padding: 20px; border-radius: 0 8px 8px 8px; }
+        .hidden { display: none !important; }
+        .diff-box { background: #1e1e2e; padding: 15px; border-radius: 8px; border-left: 4px solid #89b4fa; margin: 10px 0; }
+        .progress-bar { width: 100%; height: 10px; background: #45475a; border-radius: 5px; margin: 10px 0; }
+        .progress-fill { height: 10px; background: #a6e3a1; border-radius: 5px; width: 0%; }
         .mistake-tag { background: #f38ba8; color: #1e1e2e; padding: 4px 12px; border-radius: 20px; display: inline-block; margin: 5px; font-size: 14px; }
-        #paste-section { background: #f9e2af; color: #1e1e2e; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; margin: 15px 0; background: #181825; }
+        .quiz-option { display: block; margin: 8px 0; padding: 10px; background: #313244; border-radius: 8px; cursor: pointer; border: 1px solid transparent; }
+        .quiz-option:hover { background: #45475a; }
+        .quiz-option.selected { border-color: #89b4fa; background: #1e1e2e; }
+        .correct-feedback { color: #a6e3a1; }
+        .incorrect-feedback { color: #f38ba8; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; background: #1e1e2e; }
         th, td { border: 1px solid #45475a; padding: 8px; text-align: left; }
         th { background: #313244; }
+        .timer { font-size: 32px; font-weight: bold; color: #f9e2af; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🧗 Rope Access English Typing Gym</h1>
-        <p><i>Write freely → Get AI analysis (in ChatGPT) → Paste JSON here → Practice Touch Typing</i></p>
+        <h1>🧗 Rope Access English Gym</h1>
+        <p><i>Paste JSON from ChatGPT → Practice with games → Track progress forever</i></p>
 
-        <!-- Manual Paste Section -->
-        <div id="paste-section">
-            <h3>📋 Step 1: Paste AI Analysis JSON</h3>
-            <p>Use the prompt above in a free ChatGPT conversation. Copy the JSON block I reply with and paste it here:</p>
-            <textarea id="json-paste-area" placeholder='Paste JSON like: { "correctedText": "...", "mistakes": [...] }' rows="4"></textarea>
-            <button id="load-json-btn">🔁 Load Corrected Text & Start Typing</button>
+        <!-- JSON Input Section -->
+        <div style="background: #f9e2af; color: #1e1e2e; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            <h3>📋 Step 1: Paste AI Analysis JSON (includes original + corrected)</h3>
+            <textarea id="json-paste-area" placeholder='Paste the full JSON block here...' rows="4"></textarea>
+            <button id="load-json-btn">🔁 Load Session & Start Training</button>
             <button id="upload-progress-btn" class="secondary">📂 Upload Progress JSON (Optional)</button>
             <input type="file" id="upload-json-file" accept=".json" style="display:none;">
         </div>
 
-        <!-- Phase 1: Original Writing (No correction, just for reference) -->
-        <div id="phase-write">
-            <h2>📝 Today's Writing (Paste your original 250+ words)</h2>
-            <textarea id="original-writing" placeholder="Paste your original, uncorrected text here..." rows="6"></textarea>
-            <span class="word-count" id="word-count-display">Words: 0</span>
+        <!-- Dashboard Stats -->
+        <div id="progress-stats" class="stats hidden">
+            <h3>📈 Your Persistent Weaknesses (Across All Sessions)</h3>
+            <p>Total Sessions: <span id="total-sessions">0</span> | Unique Mistake Types: <span id="persistent-count">0</span></p>
+            <div id="weakness-list"></div>
+            <div class="progress-bar"><div id="total-progress-fill" class="progress-fill" style="width:0%"></div></div>
         </div>
 
-        <!-- Phase 2: Correction & Touch Typing -->
-        <div id="phase-correction" class="hidden">
-            <h2>🔍 Mistake Analysis & Corrected Text</h2>
+        <!-- Original & Corrected Display (always visible after load) -->
+        <div id="session-info" class="hidden">
+            <div style="display: flex; gap: 20px;">
+                <div class="diff-box" style="flex:1"><strong>📄 Your Original</strong><div id="original-display" style="white-space: pre-wrap; margin-top:10px;"></div></div>
+                <div class="diff-box" style="flex:1"><strong>✅ Corrected Target</strong><div id="corrected-display" style="white-space: pre-wrap; margin-top:10px;"></div></div>
+            </div>
             <div id="mistake-table-container"></div>
-            <div class="diff-view">
-                <div class="diff-box">
-                    <strong>📄 Your Original</strong>
-                    <div id="original-display" style="white-space: pre-wrap; margin-top: 10px;"></div>
-                </div>
-                <div class="diff-box">
-                    <strong>✅ AI Corrected Version (Target for Typing)</strong>
-                    <div id="corrected-display" style="white-space: pre-wrap; margin-top: 10px;"></div>
-                </div>
-            </div>
-            <div style="margin-top: 20px;">
-                <h3>⌨️ Touch Typing Re-Type (Type exactly the corrected text below)</h3>
-                <p style="font-size: 14px; color: #a6adc8;">👀 Look at the green text above, then type below. <strong>Mismatches are blocked.</strong></p>
-                <textarea id="retype-input" class="retype-area" placeholder="Start typing the corrected text here..." rows="6"></textarea>
-                <div id="retype-feedback" style="margin: 10px 0;"></div>
-                <button id="finish-session" class="hidden">✅ Session Complete - Download Progress JSON</button>
-            </div>
         </div>
 
-        <!-- Download Area & Progress Dashboard -->
-        <div id="dashboard-area" style="margin-top: 20px;">
-            <div id="progress-stats" class="stats hidden">
-                <h3>📈 Your Progress (Across Sessions)</h3>
-                <p>Total Sessions: <span id="total-sessions">0</span> | Persistent Mistakes: <span id="persistent-count">0</span></p>
-                <div id="weakness-list"></div>
-            </div>
+        <!-- Tab Navigation -->
+        <div id="training-tabs" class="tab-bar hidden">
+            <div class="tab active" data-tab="retype">⌨️ Touch Typing Re‑Type</div>
+            <div class="tab" data-tab="timed">⏱️ Timed Challenge</div>
+            <div class="tab" data-tab="quiz">📝 Fill‑in‑the‑Blanks Quiz</div>
         </div>
+
+        <!-- Panel 1: Re-Type (Original method) -->
+        <div id="panel-retype" class="panel">
+            <h3>⌨️ Re‑Type the Corrected Text (Mismatch Blocked)</h3>
+            <p>Type exactly the green text above. The box will turn red if you make a mistake.</p>
+            <textarea id="retype-input" placeholder="Start typing the corrected text here..." rows="6"></textarea>
+            <div id="retype-feedback" style="margin:10px 0;"></div>
+            <button id="finish-retype" class="hidden">✅ Complete Re‑Type & Download Progress</button>
+        </div>
+
+        <!-- Panel 2: Timed Challenge -->
+        <div id="panel-timed" class="panel hidden">
+            <h3>⏱️ Timed Typing Challenge</h3>
+            <p>Type the corrected text before time runs out. Accuracy matters!</p>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="timer" id="timer-display">02:00</div>
+                <button id="start-timer-btn">▶ Start Challenge</button>
+                <button id="reset-timer-btn" class="secondary">↻ Reset</button>
+            </div>
+            <div class="progress-bar"><div id="timer-progress-fill" class="progress-fill" style="width:100%"></div></div>
+            <textarea id="timed-input" placeholder="Timer not started..." rows="6" disabled></textarea>
+            <div id="timed-feedback" style="margin:10px 0;"></div>
+            <div id="timed-result"></div>
+        </div>
+
+        <!-- Panel 3: Fill-in-the-Blanks Quiz -->
+        <div id="panel-quiz" class="panel hidden">
+            <h3>📝 Grammar & Spelling Quiz (Based on Your Mistakes)</h3>
+            <div id="quiz-container">
+                <p>Loading quiz questions from your mistake list...</p>
+            </div>
+            <button id="submit-quiz" class="secondary">✅ Submit Answers</button>
+            <button id="reset-quiz" class="secondary">🔄 Retake Quiz</button>
+            <div id="quiz-score" style="margin-top:15px;"></div>
+        </div>
+
+        <!-- Download Area -->
+        <div id="download-area" style="margin-top:20px;"></div>
     </div>
 
     <script>
-        // ---------- STATE ----------
-        let appState = {
-            history: { sessions: [], persistentErrors: {} }, // cumulative from JSON uploads
-            currentSession: {
-                originalText: '',
-                correctedText: '',
-                mistakes: [],
-                date: new Date().toISOString()
-            },
-            retypeCorrect: false
-        };
-
-        // ---------- UTILS ----------
-        function countWords(str) { return str.trim().split(/\s+/).filter(w => w.length > 0).length; }
-
-        // Update word count display
-        document.getElementById('original-writing').addEventListener('input', function() {
-            const wc = countWords(this.value);
-            document.getElementById('word-count-display').innerText = `Words: ${wc}`;
-        });
-
-        // Load JSON from Paste
-        document.getElementById('load-json-btn').addEventListener('click', () => {
-            const jsonStr = document.getElementById('json-paste-area').value.trim();
-            if (!jsonStr) {
-                alert('Please paste the JSON from ChatGPT first.');
-                return;
-            }
-            try {
-                const data = JSON.parse(jsonStr);
-                if (!data.correctedText) throw new Error('Missing correctedText field.');
-                
-                // Set current session
-                const original = document.getElementById('original-writing').value.trim();
-                appState.currentSession.originalText = original || '(No original text provided)';
-                appState.currentSession.correctedText = data.correctedText;
-                appState.currentSession.mistakes = data.mistakes || [];
-                
-                // Display
-                document.getElementById('original-display').innerText = appState.currentSession.originalText;
-                document.getElementById('corrected-display').innerText = data.correctedText;
-                
-                // Build Mistake Table
-                renderMistakeTable(data.mistakes);
-                
-                // Switch to correction phase
-                document.getElementById('phase-correction').classList.remove('hidden');
-                document.getElementById('retype-input').value = '';
-                document.getElementById('finish-session').classList.add('hidden');
-                document.getElementById('retype-feedback').innerHTML = '';
-                
-            } catch (e) {
-                alert('Invalid JSON format: ' + e.message);
-            }
-        });
-
-        function renderMistakeTable(mistakes) {
-            const container = document.getElementById('mistake-table-container');
-            if (!mistakes || mistakes.length === 0) {
-                container.innerHTML = '<p>No mistakes detected. Great job!</p>';
-                return;
-            }
-            let html = '<table><tr><th>Type</th><th>Original</th><th>Correction</th></tr>';
-            mistakes.forEach(m => {
-                const typeColor = m.type === 'spelling' ? '#f9e2af' : '#89dceb';
-                html += `<tr><td style="color:${typeColor}">${m.type}</td><td><span class="error-highlight">${m.original}</span></td><td><span class="correct-highlight">${m.correction}</span></td></tr>`;
-            });
-            html += '</table>';
-            container.innerHTML = html;
-        }
-
-        // Touch Typing Validation
-        const retypeInput = document.getElementById('retype-input');
-        const finishBtn = document.getElementById('finish-session');
-        
-        retypeInput.addEventListener('input', () => {
-            const target = appState.currentSession.correctedText;
-            const current = retypeInput.value;
-            
-            if (target.startsWith(current)) {
-                retypeInput.style.borderColor = '#a6e3a1';
-                document.getElementById('retype-feedback').innerHTML = '✅ Good. Keep typing without looking at keyboard.';
-                appState.retypeCorrect = true;
-            } else {
-                retypeInput.style.borderColor = '#f38ba8';
-                document.getElementById('retype-feedback').innerHTML = '❌ Mismatch. You must type exactly the corrected text. Fix from the point of error.';
-                appState.retypeCorrect = false;
-            }
-            
-            if (current === target) {
-                document.getElementById('retype-feedback').innerHTML = '🎉 Perfect! Session complete.';
-                finishBtn.classList.remove('hidden');
-            }
-        });
-
-        // Finish Session & Download JSON
-        finishBtn.addEventListener('click', () => {
-            if (retypeInput.value !== appState.currentSession.correctedText) {
-                alert('You must type the entire corrected text exactly before finishing.');
-                return;
-            }
-            
-            // Add to history
-            const sessionEntry = {
-                date: appState.currentSession.date,
-                original: appState.currentSession.originalText.substring(0, 100) + '...',
-                corrected: appState.currentSession.correctedText.substring(0, 100) + '...',
-                mistakes: appState.currentSession.mistakes
+        (function(){
+            // ---------- STATE ----------
+            let appState = {
+                history: { sessions: [], persistentErrors: {} },
+                currentSession: {
+                    originalText: '',
+                    correctedText: '',
+                    mistakes: [],
+                    date: new Date().toISOString()
+                },
+                retypeCompleted: false,
+                timedCompleted: false,
+                quizCompleted: false
             };
-            appState.history.sessions.push(sessionEntry);
-            
-            // Update persistent errors
-            appState.currentSession.mistakes.forEach(m => {
-                const key = `${m.type}: ${m.original} → ${m.correction}`;
-                appState.history.persistentErrors[key] = (appState.history.persistentErrors[key] || 0) + 1;
-            });
-            
-            // Prepare download
-            const exportData = {
-                sessions: appState.history.sessions,
-                persistentErrors: appState.history.persistentErrors
-            };
-            
-            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `english_progress_${new Date().toISOString().slice(0,10)}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            
-            // Reset UI
-            document.getElementById('phase-correction').classList.add('hidden');
-            document.getElementById('original-writing').value = '';
-            document.getElementById('word-count-display').innerText = 'Words: 0';
-            document.getElementById('json-paste-area').value = '';
-            updateProgressDashboard();
-        });
 
-        // Upload Progress JSON (to continue tracking)
-        document.getElementById('upload-progress-btn').addEventListener('click', () => {
-            document.getElementById('upload-json-file').click();
-        });
-        
-        document.getElementById('upload-json-file').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                try {
-                    const uploaded = JSON.parse(ev.target.result);
-                    if (uploaded.sessions && uploaded.persistentErrors) {
-                        appState.history = uploaded;
-                        updateProgressDashboard();
-                        alert(`Loaded ${uploaded.sessions.length} past sessions.`);
-                    }
-                } catch (err) {
-                    alert('Invalid progress file.');
+            // Timer variables
+            let timerInterval = null;
+            let timeLeft = 120; // seconds
+            let timerRunning = false;
+
+            // Quiz state
+            let quizQuestions = [];
+            let userAnswers = [];
+
+            // DOM elements
+            const jsonArea = document.getElementById('json-paste-area');
+            const loadBtn = document.getElementById('load-json-btn');
+            const sessionInfo = document.getElementById('session-info');
+            const tabsDiv = document.getElementById('training-tabs');
+            const panels = {
+                retype: document.getElementById('panel-retype'),
+                timed: document.getElementById('panel-timed'),
+                quiz: document.getElementById('panel-quiz')
+            };
+            const retypeInput = document.getElementById('retype-input');
+            const finishRetypeBtn = document.getElementById('finish-retype');
+            const retypeFeedback = document.getElementById('retype-feedback');
+            const originalDisplay = document.getElementById('original-display');
+            const correctedDisplay = document.getElementById('corrected-display');
+            const mistakeTableContainer = document.getElementById('mistake-table-container');
+            const progressStats = document.getElementById('progress-stats');
+
+            // ---------- UTILS ----------
+            function renderMistakeTable(mistakes) {
+                if (!mistakes || mistakes.length === 0) {
+                    mistakeTableContainer.innerHTML = '<p>No mistakes recorded. Excellent!</p>';
+                    return;
                 }
-            };
-            reader.readAsText(file);
-        });
-        
-        function updateProgressDashboard() {
-            const container = document.getElementById('progress-stats');
-            if (appState.history.sessions.length === 0) {
-                container.classList.add('hidden');
-                return;
+                let html = '<table><tr><th>Type</th><th>Original</th><th>Correction</th></tr>';
+                mistakes.forEach(m => {
+                    const typeColor = m.type.includes('spelling') ? '#f9e2af' : '#89dceb';
+                    html += `<tr><td style="color:${typeColor}">${m.type}</td><td><span style="color:#f38ba8">${m.original}</span></td><td><span style="color:#a6e3a1">${m.correction}</span></td></tr>`;
+                });
+                html += '</table>';
+                mistakeTableContainer.innerHTML = html;
             }
-            container.classList.remove('hidden');
-            document.getElementById('total-sessions').innerText = appState.history.sessions.length;
-            const errorCount = Object.keys(appState.history.persistentErrors).length;
-            document.getElementById('persistent-count').innerText = errorCount;
-            
-            // Show top 5 persistent mistakes
-            const sorted = Object.entries(appState.history.persistentErrors)
-                .sort((a,b) => b[1] - a[1])
-                .slice(0, 5);
-            let html = '';
-            sorted.forEach(([key, count]) => {
-                html += `<span class="mistake-tag">${key} (${count})</span>`;
-            });
-            document.getElementById('weakness-list').innerHTML = html || 'No persistent errors recorded.';
-        }
 
-        // Initialize
-        updateProgressDashboard();
+            function updateProgressDashboard() {
+                if (appState.history.sessions.length === 0) {
+                    progressStats.classList.add('hidden');
+                    return;
+                }
+                progressStats.classList.remove('hidden');
+                document.getElementById('total-sessions').innerText = appState.history.sessions.length;
+                const errorCount = Object.keys(appState.history.persistentErrors).length;
+                document.getElementById('persistent-count').innerText = errorCount;
+                const sorted = Object.entries(appState.history.persistentErrors)
+                    .sort((a,b) => b[1] - a[1])
+                    .slice(0, 5);
+                let html = '';
+                sorted.forEach(([key, count]) => {
+                    html += `<span class="mistake-tag">${key} (${count})</span>`;
+                });
+                document.getElementById('weakness-list').innerHTML = html || 'No persistent errors recorded.';
+                const fill = Math.min(appState.history.sessions.length * 10, 100);
+                document.getElementById('total-progress-fill').style.width = fill + '%';
+            }
+
+            function loadSessionFromJSON(jsonData) {
+                appState.currentSession.originalText = jsonData.originalText || '';
+                appState.currentSession.correctedText = jsonData.correctedText || '';
+                appState.currentSession.mistakes = jsonData.mistakes || [];
+                originalDisplay.innerText = appState.currentSession.originalText;
+                correctedDisplay.innerText = appState.currentSession.correctedText;
+                renderMistakeTable(appState.currentSession.mistakes);
+                sessionInfo.classList.remove('hidden');
+                tabsDiv.classList.remove('hidden');
+                // Reset panels
+                retypeInput.value = '';
+                retypeFeedback.innerHTML = '';
+                finishRetypeBtn.classList.add('hidden');
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelector('[data-tab="retype"]').classList.add('active');
+                panels.retype.classList.remove('hidden');
+                panels.timed.classList.add('hidden');
+                panels.quiz.classList.add('hidden');
+                // Reset timer
+                resetTimer();
+                // Generate quiz
+                generateQuizFromMistakes(appState.currentSession.mistakes);
+                appState.retypeCompleted = false;
+                appState.timedCompleted = false;
+                appState.quizCompleted = false;
+            }
+
+            // ---------- EVENT: Load JSON ----------
+            loadBtn.addEventListener('click', () => {
+                const jsonStr = jsonArea.value.trim();
+                if (!jsonStr) { alert('Paste the JSON first.'); return; }
+                try {
+                    const data = JSON.parse(jsonStr);
+                    if (!data.correctedText) throw new Error('Missing correctedText');
+                    loadSessionFromJSON(data);
+                } catch(e) {
+                    alert('Invalid JSON: ' + e.message);
+                }
+            });
+
+            // ---------- RE-TYPE PANEL ----------
+            retypeInput.addEventListener('input', () => {
+                const target = appState.currentSession.correctedText;
+                const current = retypeInput.value;
+                if (target.startsWith(current)) {
+                    retypeInput.style.borderColor = '#a6e3a1';
+                    retypeFeedback.innerHTML = '✅ Good. Keep typing without looking at keyboard.';
+                } else {
+                    retypeInput.style.borderColor = '#f38ba8';
+                    retypeFeedback.innerHTML = '❌ Mismatch. Fix from the point of error.';
+                }
+                if (current === target) {
+                    retypeFeedback.innerHTML = '🎉 Perfect! Re-type complete.';
+                    finishRetypeBtn.classList.remove('hidden');
+                    appState.retypeCompleted = true;
+                } else {
+                    finishRetypeBtn.classList.add('hidden');
+                }
+            });
+
+            finishRetypeBtn.addEventListener('click', () => {
+                if (retypeInput.value !== appState.currentSession.correctedText) {
+                    alert('You must type the entire corrected text exactly.');
+                    return;
+                }
+                saveSessionAndDownload();
+            });
+
+            // ---------- TIMED CHALLENGE ----------
+            const timerDisplay = document.getElementById('timer-display');
+            const timerProgress = document.getElementById('timer-progress-fill');
+            const timedInput = document.getElementById('timed-input');
+            const timedFeedback = document.getElementById('timed-feedback');
+            const timedResult = document.getElementById('timed-result');
+            const startTimerBtn = document.getElementById('start-timer-btn');
+            const resetTimerBtn = document.getElementById('reset-timer-btn');
+
+            function formatTime(sec) {
+                const m = Math.floor(sec / 60).toString().padStart(2,'0');
+                const s = (sec % 60).toString().padStart(2,'0');
+                return `${m}:${s}`;
+            }
+
+            function updateTimerUI() {
+                timerDisplay.innerText = formatTime(timeLeft);
+                const percent = (timeLeft / 120) * 100;
+                timerProgress.style.width = percent + '%';
+                if (timeLeft <= 0) {
+                    timerProgress.style.width = '0%';
+                }
+            }
+
+            function resetTimer() {
+                if (timerInterval) clearInterval(timerInterval);
+                timerRunning = false;
+                timeLeft = 120;
+                updateTimerUI();
+                timedInput.value = '';
+                timedInput.disabled = true;
+                timedFeedback.innerHTML = '';
+                timedResult.innerHTML = '';
+                startTimerBtn.innerText = '▶ Start Challenge';
+                appState.timedCompleted = false;
+            }
+
+            function startTimer() {
+                if (timerRunning) return;
+                if (timeLeft <= 0) timeLeft = 120;
+                timerRunning = true;
+                timedInput.disabled = false;
+                timedInput.focus();
+                startTimerBtn.innerText = '⏸️ Running...';
+                timerInterval = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        updateTimerUI();
+                        // Check completion
+                        if (timedInput.value === appState.currentSession.correctedText) {
+                            clearInterval(timerInterval);
+                            timerRunning = false;
+                            timedInput.disabled = true;
+                            timedFeedback.innerHTML = '🎉 You finished with time left! Perfect!';
+                            appState.timedCompleted = true;
+                            startTimerBtn.innerText = '▶ Start Challenge';
+                        }
+                        if (timeLeft === 0) {
+                            clearInterval(timerInterval);
+                            timerRunning = false;
+                            timedInput.disabled = true;
+                            timedFeedback.innerHTML = '⏰ Time\'s up! Check your accuracy.';
+                            // Compare with target and show diff
+                            const userText = timedInput.value;
+                            if (userText === appState.currentSession.correctedText) {
+                                timedResult.innerHTML = '<span style="color:#a6e3a1">Perfect! You typed it correctly just in time.</span>';
+                                appState.timedCompleted = true;
+                            } else {
+                                timedResult.innerHTML = '<span style="color:#f38ba8">You didn\'t finish in time. Try again.</span>';
+                            }
+                            startTimerBtn.innerText = '▶ Start Challenge';
+                        }
+                    }
+                }, 1000);
+            }
+
+            startTimerBtn.addEventListener('click', () => {
+                if (!appState.currentSession.correctedText) {
+                    alert('Load a session first.');
+                    return;
+                }
+                if (timerRunning) {
+                    // Pause not implemented for simplicity
+                } else {
+                    if (timeLeft <= 0) timeLeft = 120;
+                    startTimer();
+                }
+            });
+
+            resetTimerBtn.addEventListener('click', resetTimer);
+
+            timedInput.addEventListener('input', () => {
+                if (timedInput.value === appState.currentSession.correctedText) {
+                    if (timerRunning) {
+                        clearInterval(timerInterval);
+                        timerRunning = false;
+                        startTimerBtn.innerText = '▶ Start Challenge';
+                    }
+                    timedFeedback.innerHTML = '✅ Correct! Well done.';
+                    appState.timedCompleted = true;
+                } else {
+                    // optional live feedback
+                }
+            });
+
+            // ---------- QUIZ GENERATION ----------
+            function generateQuizFromMistakes(mistakes) {
+                if (!mistakes || mistakes.length === 0) {
+                    quizQuestions = [];
+                    document.getElementById('quiz-container').innerHTML = '<p>No mistakes to practice. Great job!</p>';
+                    return;
+                }
+                // Create one question per mistake (or group similar)
+                quizQuestions = mistakes.map((m, idx) => {
+                    // Generate distractors (simple variants)
+                    const distractors = [m.correction];
+                    // Add some fake options based on original
+                    if (m.type.includes('spelling')) {
+                        distractors.push(m.original + 'e', m.original.slice(0,-1)+'y');
+                    } else {
+                        distractors.push(m.original, m.original.replace('have','has'));
+                    }
+                    // Shuffle options
+                    const options = [...new Set(distractors)]; // unique
+                    const shuffled = options.sort(() => Math.random() - 0.5);
+                    return {
+                        id: idx,
+                        type: m.type,
+                        original: m.original,
+                        correction: m.correction,
+                        options: shuffled,
+                        userChoice: null
+                    };
+                });
+                renderQuiz();
+            }
+
+            function renderQuiz() {
+                const container = document.getElementById('quiz-container');
+                if (quizQuestions.length === 0) {
+                    container.innerHTML = '<p>No quiz questions available.</p>';
+                    return;
+                }
+                let html = '';
+                quizQuestions.forEach((q, i) => {
+                    html += `<div style="margin-bottom:20px; padding:15px; background:#1e1e2e; border-radius:8px;">`;
+                    html += `<p><strong>${i+1}. Error type: ${q.type}</strong><br>`;
+                    html += `Original phrase: <span style="color:#f38ba8; background:#313244; padding:2px 6px; border-radius:4px;">"${q.original}"</span></p>`;
+                    html += `<p>Choose the correct version:</p>`;
+                    q.options.forEach(opt => {
+                        html += `<label class="quiz-option" data-qid="${i}" data-value="${opt}">`;
+                        html += `<input type="radio" name="q${i}" value="${opt}" style="margin-right:8px;"> ${opt}`;
+                        html += `</label>`;
+                    });
+                    html += `<div id="feedback-q${i}" style="margin-top:8px;"></div>`;
+                    html += `</div>`;
+                });
+                container.innerHTML = html;
+                // Attach event listeners for radio selection (optional visual)
+                document.querySelectorAll('.quiz-option').forEach(label => {
+                    label.addEventListener('click', (e) => {
+                        const radio = label.querySelector('input[type="radio"]');
+                        if (radio) radio.checked = true;
+                        // Remove selected class from siblings
+                        const parent = label.parentNode;
+                        parent.querySelectorAll('.quiz-option').forEach(l => l.classList.remove('selected'));
+                        label.classList.add('selected');
+                    });
+                });
+                userAnswers = new Array(quizQuestions.length).fill(null);
+                document.getElementById('quiz-score').innerHTML = '';
+            }
+
+            document.getElementById('submit-quiz').addEventListener('click', () => {
+                if (quizQuestions.length === 0) return;
+                let score = 0;
+                quizQuestions.forEach((q, idx) => {
+                    const selected = document.querySelector(`input[name="q${idx}"]:checked`);
+                    const feedbackDiv = document.getElementById(`feedback-q${idx}`);
+                    if (selected) {
+                        const chosen = selected.value;
+                        q.userChoice = chosen;
+                        if (chosen === q.correction) {
+                            score++;
+                            feedbackDiv.innerHTML = `<span class="correct-feedback">✅ Correct! "${chosen}" is right.</span>`;
+                        } else {
+                            feedbackDiv.innerHTML = `<span class="incorrect-feedback">❌ Incorrect. The correct answer is "${q.correction}".</span>`;
+                        }
+                    } else {
+                        feedbackDiv.innerHTML = `<span class="incorrect-feedback">⚠️ No answer selected. Correct: "${q.correction}".</span>`;
+                    }
+                });
+                const total = quizQuestions.length;
+                document.getElementById('quiz-score').innerHTML = `<h3>Score: ${score} / ${total}</h3>`;
+                if (score === total) {
+                    appState.quizCompleted = true;
+                }
+            });
+
+            document.getElementById('reset-quiz').addEventListener('click', () => {
+                generateQuizFromMistakes(appState.currentSession.mistakes);
+                appState.quizCompleted = false;
+            });
+
+            // ---------- SAVE & DOWNLOAD ----------
+            function saveSessionAndDownload() {
+                // Add current session mistakes to persistent history
+                appState.currentSession.mistakes.forEach(m => {
+                    const key = `${m.type}: ${m.original} → ${m.correction}`;
+                    appState.history.persistentErrors[key] = (appState.history.persistentErrors[key] || 0) + 1;
+                });
+                appState.history.sessions.push({
+                    date: appState.currentSession.date,
+                    original: appState.currentSession.originalText.substring(0,100)+'...',
+                    corrected: appState.currentSession.correctedText.substring(0,100)+'...',
+                    mistakesCount: appState.currentSession.mistakes.length
+                });
+                const exportData = {
+                    sessions: appState.history.sessions,
+                    persistentErrors: appState.history.persistentErrors
+                };
+                const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `english_progress_${new Date().toISOString().slice(0,10)}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                updateProgressDashboard();
+                alert('Progress saved! JSON downloaded.');
+            }
+
+            // ---------- UPLOAD PROGRESS ----------
+            document.getElementById('upload-progress-btn').addEventListener('click', () => {
+                document.getElementById('upload-json-file').click();
+            });
+            document.getElementById('upload-json-file').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if(!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    try {
+                        const uploaded = JSON.parse(ev.target.result);
+                        if (uploaded.sessions && uploaded.persistentErrors) {
+                            appState.history = uploaded;
+                            updateProgressDashboard();
+                            alert(`Loaded ${uploaded.sessions.length} past sessions.`);
+                        }
+                    } catch(err) { alert('Invalid progress file.'); }
+                };
+                reader.readAsText(file);
+            });
+
+            // ---------- TAB SWITCHING ----------
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.dataset.tab;
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    panels.retype.classList.add('hidden');
+                    panels.timed.classList.add('hidden');
+                    panels.quiz.classList.add('hidden');
+                    if (target === 'retype') panels.retype.classList.remove('hidden');
+                    if (target === 'timed') panels.timed.classList.remove('hidden');
+                    if (target === 'quiz') panels.quiz.classList.remove('hidden');
+                });
+            });
+
+            // Initialize dashboard
+            updateProgressDashboard();
+        })();
     </script>
 </body>
 </html>
